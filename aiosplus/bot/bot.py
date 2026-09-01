@@ -4,6 +4,7 @@ import io
 from pathlib import Path
 from typing import Any, BinaryIO
 
+from aiosplus.bot.context import get_current_bot, set_current_bot
 from aiosplus.client.session import AioSplusSession
 from aiosplus.enums import ChatAction, ParseMode
 from aiosplus.types import (
@@ -44,6 +45,12 @@ class Bot:
         self.session = session or AioSplusSession()
         self.default_parse_mode = default_parse_mode
         self._me: User | None = None
+        set_current_bot(self)
+
+    @classmethod
+    def get_current(cls) -> Bot | None:
+        """Get the current active Bot instance in context."""
+        return get_current_bot()
 
     async def __aenter__(self) -> Bot:
         return self

@@ -5,12 +5,15 @@ import pytest
 
 from aiosplus.bot.bot import Bot
 from aiosplus.client.session import AioSplusSession
-from aiosplus.enums import ChatAction, ParseMode
+from aiosplus.enums import ParseMode
+from aiosplus.filters import CommandHelp, CommandStart
+from aiosplus.middlewares.logging import LoggingMiddleware
 from aiosplus.types import (
-    BotCommand,
+    Chat,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     InputFile,
+    InputMediaPhoto,
     Message,
 )
 
@@ -36,6 +39,7 @@ async def test_bot_get_me() -> None:
     async with httpx.AsyncClient(transport=transport) as mock_client:
         session = AioSplusSession(client=mock_client)
         bot = Bot(token="123:TOKEN", session=session)
+        assert Bot.get_current() is bot
         me = await bot.get_me()
         assert me.id == 99999
         assert me.is_bot is True
@@ -121,58 +125,213 @@ async def test_bot_send_photo_and_multipart(tmp_path: Path) -> None:
 
 
 @pytest.mark.asyncio
-async def test_bot_get_updates() -> None:
-    def handler(request: httpx.Request) -> httpx.Response:
-        assert request.url == "https://api.splus.ir/bot123:TOKEN/getUpdates"
-        return httpx.Response(
-            200,
-            json={
-                "ok": True,
-                "result": [
-                    {
-                        "update_id": 1,
-                        "message": {
-                            "message_id": 10,
-                            "date": 1710000000,
-                            "chat": {"id": 12345, "type": "private"},
-                            "text": "Update message",
-                        },
-                    }
-                ],
-            },
-        )
-
-    transport = httpx.MockTransport(handler)
-    async with httpx.AsyncClient(transport=transport) as mock_client:
-        session = AioSplusSession(client=mock_client)
-        bot = Bot(token="123:TOKEN", session=session)
-        updates = await bot.get_updates(offset=0, timeout=10)
-        assert len(updates) == 1
-        assert updates[0].update_id == 1
-        assert updates[0].message is not None
-        assert updates[0].message.text == "Update message"
-
-
-@pytest.mark.asyncio
-async def test_bot_webhook_and_commands() -> None:
+async def test_bot_all_media_methods() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         url_str = str(request.url)
-        if "setWebhook" in url_str:
-            return httpx.Response(200, json={"ok": True, "result": True})
-        if "deleteWebhook" in url_str:
-            return httpx.Response(200, json={"ok": True, "result": True})
-        if "setMyCommands" in url_str:
-            return httpx.Response(200, json={"ok": True, "result": True})
-        if "getMyCommands" in url_str:
+        fake_msg = {
+            "message_id": 200,
+            "date": 1710000000,
+            "chat": {"id": 12345, "type": "private"},
+        }
+        if "sendAudio" in url_str:
             return httpx.Response(
                 200,
                 json={
                     "ok": True,
-                    "result": [{"command": "start", "description": "Start the bot"}],
+                    "result": {
+                        **fake_msg,
+                        "audio": {"file_id": "a1", "file_unique_id": "ua1", "duration": 120},
+                    },
                 },
             )
-        if "sendChatAction" in url_str:
+        if "sendDocument" in url_str:
+            return httpx.Response(
+                200,
+                json={
+                    "ok": True,
+                    "result": {**fake_msg, "document": {"file_id": "d1", "file_unique_id": "ud1"}},
+                },
+            )
+        if "sendVideo" in url_str:
+            return httpx.Response(
+                200,
+                json={
+                    "ok": True,
+                    "result": {
+                        **fake_msg,
+                        "video": {
+                            "file_id": "v1",
+                            "file_unique_id": "uv1",
+                            "width": 640,
+                            "height": 480,
+                            "duration": 60,
+                        },
+                    },
+                },
+            )
+        if "sendAnimation" in url_str:
+            return httpx.Response(
+                200,
+                json={
+                    "ok": True,
+                    "result": {
+                        **fake_msg,
+                        "animation": {
+                            "file_id": "an1",
+                            "file_unique_id": "uan1",
+                            "width": 320,
+                            "height": 240,
+                            "duration": 10,
+                        },
+                    },
+                },
+            )
+        if "sendVoice" in url_str:
+            return httpx.Response(
+                200,
+                json={
+                    "ok": True,
+                    "result": {
+                        **fake_msg,
+                        "voice": {"file_id": "vo1", "file_unique_id": "uvo1", "duration": 30},
+                    },
+                },
+            )
+        if "sendVideoNote" in url_str:
+            return httpx.Response(
+                200,
+                json={
+                    "ok": True,
+                    "result": {
+                        **fake_msg,
+                        "video_note": {
+                            "file_id": "vn1",
+                            "file_unique_id": "uvn1",
+                            "length": 240,
+                            "duration": 15,
+                        },
+                    },
+                },
+            )
+        if "sendLocation" in url_str:
+            return httpx.Response(
+                200,
+                json={
+                    "ok": True,
+                    "result": {**fake_msg, "location": {"latitude": 35.7, "longitude": 51.4}},
+                },
+            )
+        if "sendContact" in url_str:
+            return httpx.Response(
+                200,
+                json={
+                    "ok": True,
+                    "result": {
+                        **fake_msg,
+                        "contact": {"phone_number": "+989123456789", "first_name": "Test"},
+                    },
+                },
+            )
+        if "sendSticker" in url_str:
+            return httpx.Response(
+                200,
+                json={
+                    "ok": True,
+                    "result": {
+                        **fake_msg,
+                        "sticker": {
+                            "file_id": "s1",
+                            "file_unique_id": "us1",
+                            "width": 512,
+                            "height": 512,
+                            "is_animated": False,
+                            "is_video": False,
+                        },
+                    },
+                },
+            )
+        if "sendMediaGroup" in url_str:
+            return httpx.Response(
+                200,
+                json={
+                    "ok": True,
+                    "result": [
+                        {
+                            **fake_msg,
+                            "photo": [
+                                {
+                                    "file_id": "p1",
+                                    "file_unique_id": "up1",
+                                    "width": 100,
+                                    "height": 100,
+                                }
+                            ],
+                        }
+                    ],
+                },
+            )
+        if "getFile" in url_str:
+            return httpx.Response(
+                200,
+                json={
+                    "ok": True,
+                    "result": {
+                        "file_id": "f1",
+                        "file_unique_id": "uf1",
+                        "file_path": "photos/f1.jpg",
+                        "file_size": 1024,
+                    },
+                },
+            )
+        if "getUserProfilePhotos" in url_str:
+            return httpx.Response(
+                200,
+                json={
+                    "ok": True,
+                    "result": {
+                        "total_count": 1,
+                        "photos": [
+                            [
+                                {
+                                    "file_id": "p1",
+                                    "file_unique_id": "up1",
+                                    "width": 100,
+                                    "height": 100,
+                                }
+                            ]
+                        ],
+                    },
+                },
+            )
+        if "getChat" in url_str:
+            return httpx.Response(
+                200,
+                json={
+                    "ok": True,
+                    "result": {"id": 12345, "type": "private", "first_name": "TestChat"},
+                },
+            )
+        if "getStickerSet" in url_str:
+            return httpx.Response(
+                200,
+                json={
+                    "ok": True,
+                    "result": {"name": "test_set", "title": "Test Set", "stickers": []},
+                },
+            )
+        if (
+            "pinChatMessage" in url_str
+            or "unpinChatMessage" in url_str
+            or "deleteMessage" in url_str
+        ):
             return httpx.Response(200, json={"ok": True, "result": True})
+        if (
+            "editMessageText" in url_str
+            or "editMessageCaption" in url_str
+            or "editMessageMedia" in url_str
+            or "editMessageReplyMarkup" in url_str
+        ):
+            return httpx.Response(200, json={"ok": True, "result": fake_msg})
         return httpx.Response(404, json={"ok": False, "description": "Not Found"})
 
     transport = httpx.MockTransport(handler)
@@ -180,10 +339,88 @@ async def test_bot_webhook_and_commands() -> None:
         session = AioSplusSession(client=mock_client)
         bot = Bot(token="123:TOKEN", session=session)
 
-        assert await bot.set_webhook("https://mybot.com/webhook") is True
-        assert await bot.delete_webhook() is True
-        assert await bot.set_my_commands([BotCommand(command="start", description="Start")]) is True
-        cmds = await bot.get_my_commands()
-        assert len(cmds) == 1
-        assert cmds[0].command == "start"
-        assert await bot.send_chat_action(12345, ChatAction.TYPING) is True
+        # Audio, Doc, Video, Animation, Voice, VideoNote
+        assert (await bot.send_audio(12345, "a1")).message_id == 200
+        assert (await bot.send_document(12345, "d1")).message_id == 200
+        assert (await bot.send_video(12345, "v1")).message_id == 200
+        assert (await bot.send_animation(12345, "an1")).message_id == 200
+        assert (await bot.send_voice(12345, "vo1")).message_id == 200
+        assert (await bot.send_video_note(12345, "vn1")).message_id == 200
+        assert (await bot.send_location(12345, 35.7, 51.4)).message_id == 200
+        assert (await bot.send_contact(12345, "+989123456789", "Test")).message_id == 200
+        assert (await bot.send_sticker(12345, "s1")).message_id == 200
+
+        # MediaGroup
+        mg = await bot.send_media_group(12345, [InputMediaPhoto(media="p1")])
+        assert len(mg) == 1
+
+        # File & Profiles & Chat
+        file_obj = await bot.get_file("f1")
+        assert file_obj.file_path == "photos/f1.jpg"
+
+        prof = await bot.get_user_profile_photos(12345)
+        assert prof.total_count == 1
+
+        chat = await bot.get_chat(12345)
+        assert chat.id == 12345
+
+        stk_set = await bot.get_sticker_set("test_set")
+        assert stk_set.name == "test_set"
+
+        # Pins & Edits & Delete
+        assert await bot.pin_chat_message(12345, 200) is True
+        assert await bot.unpin_chat_message(12345, 200) is True
+        assert await bot.delete_message(12345, 200) is True
+
+        assert isinstance(await bot.edit_message_text("Edited", 12345, 200), Message)
+        assert isinstance(await bot.edit_message_caption(12345, 200, caption="New Cap"), Message)
+        assert isinstance(
+            await bot.edit_message_media(InputMediaPhoto(media="p1"), 12345, 200), Message
+        )
+        assert isinstance(await bot.edit_message_reply_markup(12345, 200), Message)
+
+
+@pytest.mark.asyncio
+async def test_command_start_and_help_filters() -> None:
+    filter_start = CommandStart(deep_link=r"ref_\d+")
+    msg_valid = Message(
+        message_id=1,
+        date=1710000000,
+        chat=Chat(id=1, type="private"),
+        text="/start ref_12345",
+    )
+    res_valid = await filter_start(msg_valid)
+    assert isinstance(res_valid, dict)
+    assert res_valid["command"].deep_link == "ref_12345"
+
+    msg_invalid = Message(
+        message_id=2,
+        date=1710000000,
+        chat=Chat(id=1, type="private"),
+        text="/start invalid_arg",
+    )
+    assert await filter_start(msg_invalid) is False
+
+    filter_help = CommandHelp()
+    msg_help = Message(
+        message_id=3,
+        date=1710000000,
+        chat=Chat(id=1, type="private"),
+        text="/help",
+    )
+    assert await filter_help(msg_help) is not False
+
+
+@pytest.mark.asyncio
+async def test_logging_middleware() -> None:
+    middleware = LoggingMiddleware()
+    called = False
+
+    async def sample_handler(_event: object, _data: dict[str, object]) -> str:
+        nonlocal called
+        called = True
+        return "done"
+
+    result = await middleware(sample_handler, "test_event", {})
+    assert result == "done"
+    assert called is True

@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import re
 from collections.abc import Sequence
 from dataclasses import dataclass
+from re import Pattern
 from typing import Any
 
 from aiosplus.filters.base import BaseFilter
@@ -15,6 +18,11 @@ class CommandObject:
     command: str
     args: str | None
     mention: str | None
+
+    @property
+    def deep_link(self) -> str | None:
+        """Deep linking argument (same as args)."""
+        return self.args
 
     @property
     def text(self) -> str:
@@ -77,3 +85,53 @@ class Command(BaseFilter):
             mention=mention,
         )
         return {"command": cmd_obj}
+
+
+class CommandStart(Command):
+    """Filter shortcut to match /start command with optional deep link argument validation."""
+
+    def __init__(
+        self,
+        deep_link: str | Pattern[str] | None = None,
+        prefix: str = "/",
+        ignore_case: bool = True,
+        ignore_mention: bool = False,
+    ) -> None:
+        super().__init__(
+            commands="start",
+            prefix=prefix,
+            ignore_case=ignore_case,
+            ignore_mention=ignore_mention,
+        )
+        self.deep_link_pattern = re.compile(deep_link) if isinstance(deep_link, str) else deep_link
+
+    async def __call__(self, event: Any, **kwargs: Any) -> bool | dict[str, Any]:
+        res = await super().__call__(event, **kwargs)
+        if not res or not isinstance(res, dict):
+            return False
+
+        if self.deep_link_pattern is not None:
+            cmd_obj: CommandObject = res["command"]
+            if not cmd_obj.args:
+                return False
+            if not self.deep_link_pattern.search(cmd_obj.args):
+                return False
+
+        return res
+
+
+class CommandHelp(Command):
+    """Filter shortcut to match /help command."""
+
+    def __init__(
+        self,
+        prefix: str = "/",
+        ignore_case: bool = True,
+        ignore_mention: bool = False,
+    ) -> None:
+        super().__init__(
+            commands="help",
+            prefix=prefix,
+            ignore_case=ignore_case,
+            ignore_mention=ignore_mention,
+        )

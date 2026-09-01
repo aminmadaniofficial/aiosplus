@@ -19,8 +19,12 @@ class SoroushObject(BaseModel):
 
     @property
     def bot(self) -> Any:
-        """Return the bound Bot instance if set."""
-        return self._bot
+        """Return the bound Bot instance if set or active context bot."""
+        if self._bot is not None:
+            return self._bot
+        from aiosplus.bot.context import get_current_bot
+
+        return get_current_bot()
 
     def as_bot(self: TSoroushObject, bot: Any) -> TSoroushObject:
         """Bind this object to a specific Bot instance."""
