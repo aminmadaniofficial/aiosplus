@@ -9,10 +9,11 @@
 ```python
 from aiosplus import State, StatesGroup
 
+
 class UserForm(StatesGroup):
-    name = State()   # مرحله اول: دریافت نام
-    age = State()    # مرحله دوم: دریافت سن
-    city = State()   # مرحله سوم: دریافت شهر
+    name = State()  # مرحله اول: دریافت نام
+    age = State()  # مرحله دوم: دریافت سن
+    city = State()  # مرحله سوم: دریافت شهر
 ```
 
 ---
@@ -28,11 +29,13 @@ from aiosplus.types import Message
 storage = MemoryStorage()
 dp = Dispatcher(storage=storage)
 
+
 # گام ۱: شروع فرآیند با /register
 @dp.message(Command("register"))
 async def start_form(message: Message, state: FSMContext) -> None:
     await state.set_state(UserForm.name)
     await message.answer("لطفاً نام خود را وارد کنید:")
+
 
 # گام ۲: دریافت نام و رفتن به مرحله سن
 @dp.message(StateFilter(UserForm.name))
@@ -40,6 +43,7 @@ async def process_name(message: Message, state: FSMContext) -> None:
     await state.update_data(name=message.text)
     await state.set_state(UserForm.age)
     await message.answer("سن خود را به صورت عدد وارد کنید:")
+
 
 # گام ۳: دریافت سن و پایان فرم
 @dp.message(StateFilter(UserForm.age))
@@ -52,11 +56,7 @@ async def process_age(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
 
     # نمایش خلاصه اطلاعات به کاربر
-    await message.answer(
-        f"✅ ثبت‌نام تکمیل شد!\n"
-        f"نام: {data['name']}\n"
-        f"سن: {data['age']}"
-    )
+    await message.answer(f"✅ ثبت‌نام تکمیل شد!\nنام: {data['name']}\nسن: {data['age']}")
 
     # پاک‌سازی وضعیت کاربر
     await state.clear()

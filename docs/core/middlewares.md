@@ -12,6 +12,7 @@
 from typing import Any, Awaitable, Callable
 from aiosplus import BaseMiddleware
 
+
 class SimpleAuthMiddleware(BaseMiddleware):
     async def __call__(
         self,
@@ -46,5 +47,6 @@ dp.message.middleware(SimpleAuthMiddleware())
 
 # یا استفاده از میدل‌ویر آماده لاگینگ کتابخانه
 from aiosplus import LoggingMiddleware
+
 dp.message.middleware(LoggingMiddleware())
 ```

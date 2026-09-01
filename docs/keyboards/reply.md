@@ -12,6 +12,7 @@ from aiosplus.filters import Command
 from aiosplus.types import Message, ReplyKeyboardRemove
 from aiosplus.utils import ReplyKeyboardBuilder
 
+
 @dp.message(Command("start"))
 async def start_with_menu(message: Message) -> None:
     builder = ReplyKeyboardBuilder()
@@ -27,7 +28,7 @@ async def start_with_menu(message: Message) -> None:
     await message.answer(
         "منوی اصلی فعال شد:",
         reply_markup=builder.as_markup(
-            resize_keyboard=True, # کوچک کردن دکمه‌ها متناسب با صفحه
+            resize_keyboard=True,  # کوچک کردن دکمه‌ها متناسب با صفحه
             input_field_placeholder="انتخاب از منو...",
         ),
     )

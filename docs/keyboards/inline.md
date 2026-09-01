@@ -14,6 +14,7 @@ from aiosplus.filters import Command
 from aiosplus.types import CallbackQuery, Message
 from aiosplus.utils import InlineKeyboardBuilder
 
+
 @dp.message(Command("menu"))
 async def show_menu(message: Message) -> None:
     builder = InlineKeyboardBuilder()

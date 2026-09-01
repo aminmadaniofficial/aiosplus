@@ -56,19 +56,23 @@ from aiosplus.types import Message
 bot = Bot(token="YOUR_BOT_TOKEN_HERE")
 dp = Dispatcher()
 
+
 # پاسخ به دستور /start
 @dp.message(CommandStart())
 async def on_start(message: Message) -> None:
     await message.answer(f"سلام {message.from_user.first_name}! خوش آمدید.")
+
 
 # فیلتر پیام‌های خاص با Magic Filter F
 @dp.message(F.text == "سلام")
 async def on_hello(message: Message) -> None:
     await message.reply("سلام و درود! چطور می‌تونم کمکتون کنم؟")
 
+
 async def main() -> None:
     print("ربات با موفقیت فعال شد...")
     await dp.start_polling(bot, drop_pending_updates=True)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

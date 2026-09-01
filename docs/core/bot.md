@@ -12,7 +12,7 @@ from aiosplus.enums import ParseMode
 
 bot = Bot(
     token="YOUR_BOT_TOKEN",
-    default_parse_mode=ParseMode.HTML, # تنظیم پیش‌فرض فرمت پیام‌ها (HTML یا MarkdownV2)
+    default_parse_mode=ParseMode.HTML,  # تنظیم پیش‌فرض فرمت پیام‌ها (HTML یا MarkdownV2)
 )
 ```
 

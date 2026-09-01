@@ -25,6 +25,7 @@ admin_router = Router(name="admin")
 
 ADMIN_ID = 12345678
 
+
 @admin_router.message(Command("panel"), F.from_user.id == ADMIN_ID)
 async def admin_panel(message: Message) -> None:
     await message.answer("خوش آمدید ادمین گرامی!")
@@ -44,8 +45,10 @@ dp = Dispatcher()
 # الحاق روتر ادمین به دیسپچر اصلی
 dp.include_router(admin_router)
 
+
 async def main() -> None:
     await dp.start_polling(bot)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

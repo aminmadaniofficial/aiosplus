@@ -38,6 +38,7 @@ from pathlib import Path
 from aiosplus import F
 from aiosplus.types import Message
 
+
 # هندلر دریافت عکس
 @dp.message(F.photo)
 async def on_user_photo(message: Message) -> None:
