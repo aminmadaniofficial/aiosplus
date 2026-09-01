@@ -84,6 +84,21 @@ from aiosplus.types import (
     UserProfilePhotos,
     WebhookInfo,
 )
+from aiosplus.utils.formatting import (
+    blockquote,
+    bold,
+    code,
+    escape_html,
+    escape_md,
+    italic,
+    link,
+    pre,
+    spoiler,
+    strikethrough,
+    underline,
+)
+from aiosplus.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
+from aiosplus.utils.webhook import SimpleWebhookHandler
 
 __version__ = "0.1.0"
 __author__ = "Amin Madani"
@@ -113,6 +128,21 @@ __all__ = [
     "F",
     # Middlewares
     "BaseMiddleware",
+    # Utilities
+    "InlineKeyboardBuilder",
+    "ReplyKeyboardBuilder",
+    "escape_md",
+    "escape_html",
+    "bold",
+    "italic",
+    "underline",
+    "strikethrough",
+    "spoiler",
+    "code",
+    "pre",
+    "link",
+    "blockquote",
+    "SimpleWebhookHandler",
     # Enums
     "ParseMode",
     "ChatType",
