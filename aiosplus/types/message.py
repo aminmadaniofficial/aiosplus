@@ -115,9 +115,9 @@ class Message(SoroushObject):
         | None = None,
     ) -> "Message":
         """Convenience method to send a reply to the same chat."""
-        if self._bot is None:
+        if self.bot is None:
             raise RuntimeError("Bot instance is not bound to this Message object.")
-        res = await self._bot.send_message(
+        res = await self.bot.send_message(
             chat_id=self.chat.id,
             text=text,
             parse_mode=parse_mode,
@@ -141,9 +141,9 @@ class Message(SoroushObject):
         allow_sending_without_reply: bool | None = None,
     ) -> "Message":
         """Convenience method to reply directly to this message."""
-        if self._bot is None:
+        if self.bot is None:
             raise RuntimeError("Bot instance is not bound to this Message object.")
-        res = await self._bot.send_message(
+        res = await self.bot.send_message(
             chat_id=self.chat.id,
             text=text,
             parse_mode=parse_mode,
@@ -168,9 +168,9 @@ class Message(SoroushObject):
         | None = None,
     ) -> "Message":
         """Convenience method to send a photo to the same chat."""
-        if self._bot is None:
+        if self.bot is None:
             raise RuntimeError("Bot instance is not bound to this Message object.")
-        res = await self._bot.send_photo(
+        res = await self.bot.send_photo(
             chat_id=self.chat.id,
             photo=photo,
             caption=caption,
@@ -193,9 +193,9 @@ class Message(SoroushObject):
         | None = None,
     ) -> "Message":
         """Convenience method to send a document to the same chat."""
-        if self._bot is None:
+        if self.bot is None:
             raise RuntimeError("Bot instance is not bound to this Message object.")
-        res = await self._bot.send_document(
+        res = await self.bot.send_document(
             chat_id=self.chat.id,
             document=document,
             caption=caption,
@@ -207,9 +207,9 @@ class Message(SoroushObject):
 
     async def delete(self) -> bool:
         """Convenience method to delete this message."""
-        if self._bot is None:
+        if self.bot is None:
             raise RuntimeError("Bot instance is not bound to this Message object.")
-        res = await self._bot.delete_message(chat_id=self.chat.id, message_id=self.message_id)
+        res = await self.bot.delete_message(chat_id=self.chat.id, message_id=self.message_id)
         return cast(bool, res)
 
     async def edit_text(
@@ -221,9 +221,9 @@ class Message(SoroushObject):
         reply_markup: InlineKeyboardMarkup | None = None,
     ) -> "Message | bool":
         """Convenience method to edit this message's text."""
-        if self._bot is None:
+        if self.bot is None:
             raise RuntimeError("Bot instance is not bound to this Message object.")
-        res = await self._bot.edit_message_text(
+        res = await self.bot.edit_message_text(
             chat_id=self.chat.id,
             message_id=self.message_id,
             text=text,
@@ -239,9 +239,9 @@ class Message(SoroushObject):
         reply_markup: InlineKeyboardMarkup | None = None,
     ) -> "Message | bool":
         """Convenience method to edit this message's reply markup."""
-        if self._bot is None:
+        if self.bot is None:
             raise RuntimeError("Bot instance is not bound to this Message object.")
-        res = await self._bot.edit_message_reply_markup(
+        res = await self.bot.edit_message_reply_markup(
             chat_id=self.chat.id,
             message_id=self.message_id,
             reply_markup=reply_markup,
@@ -250,7 +250,7 @@ class Message(SoroushObject):
 
     async def pin(self) -> bool:
         """Convenience method to pin this message."""
-        if self._bot is None:
+        if self.bot is None:
             raise RuntimeError("Bot instance is not bound to this Message object.")
-        res = await self._bot.pin_chat_message(chat_id=self.chat.id, message_id=self.message_id)
+        res = await self.bot.pin_chat_message(chat_id=self.chat.id, message_id=self.message_id)
         return cast(bool, res)

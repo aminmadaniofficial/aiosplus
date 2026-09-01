@@ -106,6 +106,9 @@ async def test_router_and_dispatcher_dispatch() -> None:
     @router.callback_query(F.data == "click_me")
     async def callback_handler(callback: CallbackQuery) -> None:
         handled_events.append(f"callback:{callback.data}")
+        await callback.answer("Alert message", show_alert=True)
+        if callback.message:
+            await callback.message.edit_text("New edited text")
 
     transport = httpx.MockTransport(
         lambda _req: httpx.Response(200, json={"ok": True, "result": True})
@@ -127,13 +130,19 @@ async def test_router_and_dispatcher_dispatch() -> None:
         assert handled1 is True
         assert handled_events == ["hello:hello"]
 
-        # Feed callback update
+        # Feed callback update with nested message
         up2 = Update(
             update_id=2,
             callback_query=CallbackQuery(
                 id="cb_1",
                 from_user=User(id=1, is_bot=False, first_name="Tester"),
                 data="click_me",
+                message=Message(
+                    message_id=10,
+                    date=1710000000,
+                    chat=Chat(id=1, type="private"),
+                    text="Old message",
+                ),
             ),
         )
         handled2 = await dp.feed_update(bot, up2)

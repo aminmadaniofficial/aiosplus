@@ -27,8 +27,20 @@ class SoroushObject(BaseModel):
         return get_current_bot()
 
     def as_bot(self: TSoroushObject, bot: Any) -> TSoroushObject:
-        """Bind this object to a specific Bot instance."""
+        """Bind this object and all nested SoroushObjects to a specific Bot instance."""
         self._bot = bot
+        for field_name in type(self).model_fields:
+            val = getattr(self, field_name, None)
+            if isinstance(val, SoroushObject):
+                val.as_bot(bot)
+            elif isinstance(val, list):
+                for item in val:
+                    if isinstance(item, SoroushObject):
+                        item.as_bot(bot)
+            elif isinstance(val, dict):
+                for item in val.values():
+                    if isinstance(item, SoroushObject):
+                        item.as_bot(bot)
         return self
 
 

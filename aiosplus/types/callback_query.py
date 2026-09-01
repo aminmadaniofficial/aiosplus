@@ -23,9 +23,9 @@ class CallbackQuery(SoroushObject):
         cache_time: int | None = None,
     ) -> bool:
         """Convenience method to answer this callback query."""
-        if self._bot is None:
+        if self.bot is None:
             raise RuntimeError("Bot instance is not bound to this CallbackQuery object.")
-        res = await self._bot.answer_callback_query(
+        res = await self.bot.answer_callback_query(
             callback_query_id=self.id,
             text=text,
             show_alert=show_alert,

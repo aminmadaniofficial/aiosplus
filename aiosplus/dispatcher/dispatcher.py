@@ -50,6 +50,10 @@ class Dispatcher(Router):
 
     async def feed_update(self, bot: Bot, update: Update, **kwargs: Any) -> bool:
         """Feed an incoming update through the router pipeline."""
+        from aiosplus.bot.context import set_current_bot
+
+        set_current_bot(bot)
+        update.as_bot(bot)
         event = update.event
         event_type = update.event_type
 
