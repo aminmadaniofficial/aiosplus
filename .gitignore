@@ -70,3 +70,8 @@ dmypy.json
 *.swo
 *~
 .DS_Store
+
+# Local testing environments (never commit)
+local_test/
+test_bot/
+playground/

@@ -44,6 +44,14 @@ fastapi = [
     "fastapi>=0.110.0",
     "uvicorn>=0.28.0",
 ]
+redis = [
+    "redis>=5.0.0",
+]
+all = [
+    "fastapi>=0.110.0",
+    "uvicorn>=0.28.0",
+    "redis>=5.0.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/aminmadaniofficial/aiosplus"
@@ -100,5 +108,5 @@ show_error_codes = true
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = "aiofiles.*"
+module = ["aiofiles.*", "redis.*"]
 ignore_missing_imports = true
