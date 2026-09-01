@@ -1,5 +1,6 @@
 """aiosplus - Modern, asynchronous Python framework for Soroush Plus Bot API."""
 
+from aiosplus.bot.bot import Bot
 from aiosplus.client.session import AioSplusSession
 from aiosplus.enums import (
     BotCommandScopeType,
@@ -70,6 +71,7 @@ __version__ = "0.1.0"
 __author__ = "Amin Madani"
 __all__ = [
     "__version__",
+    "Bot",
     "AioSplusSession",
     # Enums
     "ParseMode",

@@ -1,6 +1,8 @@
-from typing import Any
+from typing import Any, TypeVar
 
 from pydantic import BaseModel, ConfigDict, PrivateAttr
+
+TSoroushObject = TypeVar("TSoroushObject", bound="SoroushObject")
 
 
 class SoroushObject(BaseModel):
@@ -20,7 +22,7 @@ class SoroushObject(BaseModel):
         """Return the bound Bot instance if set."""
         return self._bot
 
-    def as_bot(self, bot: Any) -> "SoroushObject":
+    def as_bot(self: TSoroushObject, bot: Any) -> TSoroushObject:
         """Bind this object to a specific Bot instance."""
         self._bot = bot
         return self
