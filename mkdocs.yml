@@ -1,0 +1,106 @@
+site_name: aiosplus
+site_description: Modern, Asynchronous, Typed Python Framework for Soroush Plus Bot API
+site_author: Amin Madani
+site_url: https://aminmadaniofficial.github.io/aiosplus/
+repo_url: https://github.com/aminmadaniofficial/aiosplus
+repo_name: aminmadaniofficial/aiosplus
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  language: fa
+  direction: rtl
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+  palette:
+    # Light mode
+    - scheme: default
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: تغییر به حالت تاریک (Dark Mode)
+    # Dark mode
+    - scheme: slate
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: تغییر به حالت روشن (Light Mode)
+  font:
+    text: Vazirmatn, Roboto, sans-serif
+    code: JetBrains Mono, Fira Code, monospace
+  icon:
+    repo: fontawesome/brands/github
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/aminmadaniofficial/aiosplus
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/aiosplus/
+
+plugins:
+  - search
+  - minify:
+      minify_html: true
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - attr_list
+  - md_in_html
+  - def_list
+
+extra_css:
+  - stylesheets/extra.css
+
+nav:
+  - راهنمای جامع:
+      - معرفی و شروع: index.md
+      - نصب و راه‌اندازی: getting-started/installation.md
+      - اولین ربات (Quickstart): getting-started/quickstart.md
+  - هسته اصلی (Core):
+      - کلاینت ربات (Bot): core/bot.md
+      - دیسپچر و روترها (Dispatcher): core/dispatcher.md
+      - فیلترها و فیلتر جادویی (F): core/filters.md
+      - میان‌افزارها (Middlewares): core/middlewares.md
+  - ماشین وضعیت (FSM):
+      - مفاهیم و مراحل: fsm/overview.md
+      - فضاهای ذخیره‌سازی (Memory & Redis): fsm/storages.md
+  - کیبوردها و دکمه‌ها:
+      - کیبورد شیشه‌ای (Inline): keyboards/inline.md
+      - کیبورد معمولی (Reply): keyboards/reply.md
+  - رسانه‌ها و فایل‌ها:
+      - ارسال و دانلود فایل: media/files.md
+      - آلبوم‌های رسانه‌ای: media/albums.md
+  - وب‌هوک (Webhooks):
+      - استقرار با FastAPI: webhooks/fastapi.md
+  - مثال‌های کاربردی:
+      - ربات اکو (Echo Bot): examples/echo.md
+      - ربات نظرسنجی و فرم (Survey Bot): examples/survey.md
+      - ربات ادمین و دیتابیس (Admin & DB): examples/admin-db.md
+  - مرجع کامل API:
+      - جدول متدهای سروش‌پلاس: api-reference/methods.md

@@ -75,3 +75,6 @@ dmypy.json
 local_test/
 test_bot/
 playground/
+
+# MkDocs generated site
+site/
